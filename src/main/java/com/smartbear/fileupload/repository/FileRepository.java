@@ -1,7 +1,9 @@
 package com.smartbear.fileupload.repository;
 
-import com.smartbear.fileupload.entity.File;
+import com.smartbear.fileupload.model.File;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface FileRepository extends MongoRepository<File, String> {
+import java.util.UUID;
+
+public interface FileRepository extends MongoRepository<File, UUID> {
 }
