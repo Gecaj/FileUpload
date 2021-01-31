@@ -1,11 +1,10 @@
 package com.smartbear.fileupload.service;
 
-import com.smartbear.fileupload.dto.FileDto;
+import com.smartbear.fileupload.dto.SaveFileDto;
+import com.smartbear.fileupload.dto.SearchByTagsResponseDto;
 import com.smartbear.fileupload.facade.FileFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -16,7 +15,12 @@ public class FileController {
     private final FileFacade fileFacade;
 
     @PostMapping("/file")
-    public UUID createFile(@RequestBody FileDto fileDto) {
-        return fileFacade.addFile(fileDto);
+    public UUID createFile(@RequestBody SaveFileDto saveFileDto) {
+        return fileFacade.addFile(saveFileDto);
+    }
+
+    @GetMapping("/files/{tag_search_query}/{page}")
+    public SearchByTagsResponseDto findFilesByTags(@PathVariable String tag_search_query, @PathVariable int page) {
+        return fileFacade.findFilesByTags(tag_search_query, page);
     }
 }

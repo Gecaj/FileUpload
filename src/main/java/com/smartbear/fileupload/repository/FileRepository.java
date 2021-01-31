@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.UUID;
 
-public interface FileRepository extends MongoRepository<File, UUID> {
+public interface FileRepository extends MongoRepository<File, UUID>, FileRepositoryCustom {
 }
