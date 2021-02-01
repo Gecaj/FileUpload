@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,9 +22,11 @@ import java.util.stream.Collectors;
 public class FileFacade {
 
     private static final int PAGE_SIZE = 10;
+
+    private final FileMapper fileMapper;
     private final TagsConverter tagsConverter;
     private final FileRepository fileRepository;
-    private final FileMapper fileMapper;
+    private final RelatedTagsFinder relatedTagsFinder;
 
     public UUID addFile(SaveFileDto saveFileDto) {
         validateTags(saveFileDto.getTags());
@@ -43,10 +44,12 @@ public class FileFacade {
         String includeQueryString = prepareIncludeQueryString(includeTags);
         String excludeQueryString = prepareExcludeQueryString(tagsQuery);
         String queryString = String.format("%s %s", includeQueryString, excludeQueryString);
-        Long allFilesCount = fileRepository.countFilesWithAndWithoutTags(queryString);
-        List<File> files = fileRepository.findFilesWithAndWithoutTags(queryString, PageRequest.of(page, PAGE_SIZE));
-        List<RelatedTagDto> related_tags = Collections.emptyList();
-        return new SearchByTagsResponseDto(allFilesCount.intValue(), related_tags, files.stream().map(fileMapper::toFileDto).collect(Collectors.toList()));
+        List<File> allFiles = fileRepository.findFilesWithAndWithoutTags(queryString);
+        List<File> filesFromPage = fileRepository.findFilesWithAndWithoutTags(queryString, PageRequest.of(page, PAGE_SIZE));
+        List<RelatedTagDto> related_tags = relatedTagsFinder.findRelatedTags(allFiles, includeTags);
+        return new SearchByTagsResponseDto(allFiles.size(), related_tags, filesFromPage.stream()
+                .map(fileMapper::toFileDto)
+                .collect(Collectors.toList()));
     }
 
     private List<String> extractIncludeTags(String tagsQuery) {
@@ -57,8 +60,7 @@ public class FileFacade {
     }
 
     private String prepareExcludeQueryString(String tagsQuery) {
-        String excludeQueryString = Arrays.stream(tagsQuery.split(" ")).filter(s -> s.startsWith("-")).collect(Collectors.joining(" "));
-        return excludeQueryString;
+        return Arrays.stream(tagsQuery.split(" ")).filter(s -> s.startsWith("-")).collect(Collectors.joining(" "));
     }
 
     private String prepareIncludeQueryString(List<String> includeTags) {

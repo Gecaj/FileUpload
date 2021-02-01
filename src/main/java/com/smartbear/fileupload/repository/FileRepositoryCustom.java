@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FileRepositoryCustom {
 
-    List<File> findFilesWithAndWithoutTags(String tagsQuery, Pageable pageable);
+    List<File> findFilesWithAndWithoutTags(String tagsQuery);
 
-    Long countFilesWithAndWithoutTags(String tagsQuery);
+    List<File> findFilesWithAndWithoutTags(String tagsQuery, Pageable pageable);
 }

@@ -16,17 +16,17 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public List<File> findFilesWithAndWithoutTags(String tagsQuery, Pageable pageable) {
+    public List<File> findFilesWithAndWithoutTags(String tagsQuery) {
         ensureTextIndex();
-        Query query = new TextQuery(tagsQuery).with(pageable);
+        Query query = new TextQuery(tagsQuery);
         return mongoTemplate.find(query, File.class);
     }
 
     @Override
-    public Long countFilesWithAndWithoutTags(String tagsQuery) {
+    public List<File> findFilesWithAndWithoutTags(String tagsQuery, Pageable pageable) {
         ensureTextIndex();
-        Query query = new TextQuery(tagsQuery);
-        return mongoTemplate.count(query, File.class);
+        Query query = new TextQuery(tagsQuery).with(pageable);
+        return mongoTemplate.find(query, File.class);
     }
 
     private void ensureTextIndex() {

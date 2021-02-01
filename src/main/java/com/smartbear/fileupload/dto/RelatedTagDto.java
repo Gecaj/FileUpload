@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class RelatedTagDto {
     private final String tag;
-    private final String file_count;
+    private final Integer file_count;
 }
