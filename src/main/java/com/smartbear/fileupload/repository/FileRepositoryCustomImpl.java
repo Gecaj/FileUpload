@@ -2,7 +2,6 @@ package com.smartbear.fileupload.repository;
 
 import com.smartbear.fileupload.model.File;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,13 +18,6 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom {
     public List<File> findFilesWithAndWithoutTags(String tagsQuery) {
         ensureTextIndex();
         Query query = new TextQuery(tagsQuery);
-        return mongoTemplate.find(query, File.class);
-    }
-
-    @Override
-    public List<File> findFilesWithAndWithoutTags(String tagsQuery, Pageable pageable) {
-        ensureTextIndex();
-        Query query = new TextQuery(tagsQuery).with(pageable);
         return mongoTemplate.find(query, File.class);
     }
 

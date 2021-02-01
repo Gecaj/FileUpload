@@ -7,7 +7,6 @@ import com.smartbear.fileupload.mapper.FileMapper;
 import com.smartbear.fileupload.model.File;
 import com.smartbear.fileupload.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,11 +44,15 @@ public class FileFacade {
         String excludeQueryString = prepareExcludeQueryString(tagsQuery);
         String queryString = String.format("%s %s", includeQueryString, excludeQueryString);
         List<File> allFiles = fileRepository.findFilesWithAndWithoutTags(queryString);
-        List<File> filesFromPage = fileRepository.findFilesWithAndWithoutTags(queryString, PageRequest.of(page, PAGE_SIZE));
+        List<File> filesFromPage = getPage(allFiles, page);
         List<RelatedTagDto> related_tags = relatedTagsFinder.findRelatedTags(allFiles, includeTags);
         return new SearchByTagsResponseDto(allFiles.size(), related_tags, filesFromPage.stream()
                 .map(fileMapper::toFileDto)
                 .collect(Collectors.toList()));
+    }
+
+    private List<File> getPage(List<File> allFiles, int page) {
+        return allFiles.subList((page == 0 ? 0 : (page - 1)) * PAGE_SIZE, Math.min(page * PAGE_SIZE, allFiles.size()));
     }
 
     private List<String> extractIncludeTags(String tagsQuery) {
